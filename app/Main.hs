@@ -89,4 +89,4 @@ main = play
   initialModel
   (\model -> pictures $ color white (circleSolid worldRadius) : map (draw objectRadius) (Vec.toList model))
   handleEvent
-  stepModelDown
+  stepModelSpace -- stepModelDown
