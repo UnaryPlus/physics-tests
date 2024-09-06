@@ -48,6 +48,7 @@ applyConstraint v@(Verlet acc pos prevPos) =
 
 fixCollisions :: MVector s Verlet -> ST s ()
 fixCollisions objects = do
+  -- TODO: randomize order?
   forM_ [0 .. MVec.length objects - 1] $ \i ->
     forM_ [0 .. i - 1] $ \j -> do
       -- TODO: check that this algorithm is correct
