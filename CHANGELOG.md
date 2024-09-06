@@ -1,4 +1,4 @@
-# Revision history for physics-test
+# Revision history for physics-tests
 
 ## 0.1.0.0 -- YYYY-mm-dd
 
