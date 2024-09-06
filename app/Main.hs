@@ -21,6 +21,9 @@ worldRadius = 350
 gravityStrength = 50
 bigG = gravityStrength * 30000
 
+windowSize :: Int
+windowSize = 700
+
 applyGravityDown :: Verlet -> Verlet
 applyGravityDown (Verlet _ pos prevPos) = Verlet (V2 0 (-gravityStrength)) pos prevPos
 
@@ -80,7 +83,7 @@ handleEvent event vs =
 
 main :: IO ()
 main = play
-  (InWindow "physics test" (700, 700) (20, 20))
+  (InWindow "physics test" (windowSize, windowSize) (20, 20))
   black -- background color
   60    -- fps
   initialModel
