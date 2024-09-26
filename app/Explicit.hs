@@ -102,6 +102,7 @@ draw r (Ball (V2 x y) _ _) = translate x y $ color (light blue) $ circleSolid r
 drawModel :: Params -> Vector Ball -> Picture
 drawModel params = pictures . map (draw (params^.objectRadius)) . Vec.toList
 
+-- TODO: don't add new ball if it collides with existing ball
 handleEvent :: Event -> Vector Ball -> Vector Ball
 handleEvent event vs =
   case event of

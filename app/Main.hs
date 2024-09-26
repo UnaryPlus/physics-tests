@@ -16,4 +16,3 @@ main = getArgs >>= \case
       "implicitspace" -> Simulation.run args implicitSpace
       "elasticspace" -> Simulation.run args elasticSpace
       _ -> putStrLn "First argument must be one of: implicitdown, implicitspace, elasticspace"
-
