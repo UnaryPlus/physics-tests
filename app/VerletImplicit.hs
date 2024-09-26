@@ -44,7 +44,7 @@ applyConstraint params v@(Verlet acc pos prevPos) =
 
 fixCollisions :: Params -> MVector s Verlet -> ST s ()
 fixCollisions params objects = do
-  -- TODO: randomize order? (or fix spinning problem in some other way (but keep current version as an option?))
+  -- TODO: fix spinning problem (randomizing order doesn't work) but keep current version as an option
   forM_ [0 .. MVec.length objects - 1] $ \i ->
     forM_ [0 .. i - 1] $ \j -> do
       Verlet acc1 pos1 prevPos1 <- MVec.read objects i
@@ -59,6 +59,9 @@ fixCollisions params objects = do
 
 stepModelDown :: Params -> Float -> Vector Verlet -> Vector Verlet
 stepModelDown params dt = Vec.modify (fixCollisions params) . fmap (applyConstraint params . updateVerlet dt . applyGravityDown params)
+
+stepModelInward :: Params -> Float -> Vector Verlet -> Vector Verlet
+stepModelInward params dt = Vec.modify (fixCollisions params) . fmap (applyConstraint params . updateVerlet dt . applyGravityInward params)
 
 stepModelSpace :: Params -> Float -> Vector Verlet -> Vector Verlet
 stepModelSpace params dt vs = Vec.modify (fixCollisions params) $ fmap (applyConstraint params . updateVerlet dt . applyGravitySpace params vs) vs
