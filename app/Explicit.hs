@@ -46,15 +46,18 @@ integrateBalls params dt balls = let
   balls' = Vec.zipWith3 (updateBall dt) ps as balls 
   in balls'
 
+overlapping :: Params -> Ball -> Ball -> Bool
+overlapping params (Ball p1 _ _) (Ball p2 _ _) =
+  norm (p1 - p2) < 2 * params^.objectRadius
+
 colliding :: Params -> Ball -> Ball -> Bool
-colliding params (Ball p1 v1 _) (Ball p2 v2 _) = let
-  touching = norm (p1 - p2) < 2 * params^.objectRadius
+colliding params b1@(Ball p1 v1 _) b2@(Ball p2 v2 _) = let
   inward = dot (v1 - v2) (p1 - p2) < 0
-  in touching && inward 
+  in overlapping params b1 b2 && inward 
 
 -- assumes balls are colliding
-handleCollision :: (Ball, Ball) -> (Ball, Ball)
-handleCollision (Ball p1 v1 a1, Ball p2 v2 a2) = let
+collideElastic :: (Ball, Ball) -> (Ball, Ball)
+collideElastic (Ball p1 v1 a1, Ball p2 v2 a2) = let
   -- wikipedia formula
   v1' = v1 - (dot (v1 - v2) (p1 - p2) / quadrance (p1 - p2)) *^ (p1 - p2)
   v2' = v2 - (dot (v2 - v1) (p2 - p1) / quadrance (p2 - p1)) *^ (p2 - p1)
@@ -68,7 +71,7 @@ handleCollisions params = Vec.modify $ \balls -> do
       ball1 <- MVec.read balls i
       ball2 <- MVec.read balls j
       when (colliding params ball1 ball2) $ do
-        let (ball1', ball2') = handleCollision (ball1, ball2)
+        let (ball1', ball2') = collideElastic (ball1, ball2)
         MVec.write balls i ball1'
         MVec.write balls j ball2' 
 
@@ -102,12 +105,13 @@ draw r (Ball (V2 x y) _ _) = translate x y $ color (light blue) $ circleSolid r
 drawModel :: Params -> Vector Ball -> Picture
 drawModel params = pictures . map (draw (params^.objectRadius)) . Vec.toList
 
--- TODO: don't add new ball if it collides with existing ball
-handleEvent :: Event -> Vector Ball -> Vector Ball
-handleEvent event vs =
+handleEvent :: Params -> Event -> Vector Ball -> Vector Ball
+handleEvent params event vs =
   case event of
     EventKey (MouseButton LeftButton) Down (Modifiers Up Up Up) (x, y) -> 
-      Vec.cons (Ball (V2 x y) zero zero) vs
+      let newBall = Ball (V2 x y) zero zero in
+      if any (overlapping params newBall) vs then vs
+      else Vec.cons newBall vs
     EventKey (Char 'r') Down (Modifiers Up Up Up) _ -> Vec.empty
     _ -> vs
 
@@ -120,8 +124,6 @@ elasticSpace params = Simulation
   , _backgroundColor = white
   , _initialModel = Vec.empty
   , _drawModel = drawModel params
-  , _handleEvent = handleEvent
+  , _handleEvent = handleEvent params
   , _stepModel = stepModel params
   }
-
--- TODO: add inelasticSpace

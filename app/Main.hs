@@ -11,7 +11,6 @@ main = getArgs >>= \case
   [] -> putStrLn "TODO: add documentation"
   name : args ->
     case name of
-      -- I wish Haskell had Sigma types :(
       "implicitdown" -> Simulation.run args implicitDown
       "implicitspace" -> Simulation.run args implicitSpace
       "elasticspace" -> Simulation.run args elasticSpace
