@@ -47,7 +47,6 @@ fixCollisions params objects = do
   -- TODO: randomize order? (or fix spinning problem in some other way (but keep current version as an option?))
   forM_ [0 .. MVec.length objects - 1] $ \i ->
     forM_ [0 .. i - 1] $ \j -> do
-      -- TODO: check that this algorithm is correct
       Verlet acc1 pos1 prevPos1 <- MVec.read objects i
       Verlet acc2 pos2 prevPos2 <- MVec.read objects j
       let err = params^.objectRadius - norm (pos1 - pos2) / 2
